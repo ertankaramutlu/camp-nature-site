@@ -32,8 +32,32 @@ export const metadata: Metadata = {
 export default async function Home() {
   const stays = await getStays();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LodgingBusiness",
+    name: "Alice in Boyabağı",
+    url: "https://camp-nature-site-jqiz.vercel.app",
+    telephone: "+905543343722",
+    image: OG_IMAGE,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Boyabağı Köyü",
+      addressLocality: "Karaburun",
+      addressRegion: "İzmir",
+      addressCountry: "TR",
+    },
+    areaServed: {
+      "@type": "Place",
+      name: "Karaburun",
+    },
+  };
+
   return (
     <main className="bg-stone-950 text-stone-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Hero />
       <Hakkinda />
       <Konaklama stays={stays} />

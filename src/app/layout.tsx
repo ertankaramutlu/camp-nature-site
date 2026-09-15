@@ -31,6 +31,12 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Alice in Boyabağı Glamping" }],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
   icons: {
     icon: [{ url: "/icon", type: "image/png" }],
     apple: [
