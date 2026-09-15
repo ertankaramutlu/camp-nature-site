@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Leaf } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { scrollToHash } from "@/lib/scrollToHash";
 
 const navLinks = [
   { label: "Hakkında", href: "/#hakkinda" },
@@ -14,11 +15,9 @@ const navLinks = [
   { label: "Blog", href: "/blog" },
 ];
 
-function scrollToHash(id: string) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+function goToHash(id: string) {
+  scrollToHash(id);
+  history.pushState(null, "", `/#${id}`);
 }
 
 export default function Header() {
@@ -53,10 +52,14 @@ export default function Header() {
 
     const go = () => {
       if (onHome) {
-        scrollToHash(id);
-        history.pushState(null, "", `/#${id}`);
+        goToHash(id);
       } else {
-        router.push(`/#${id}`);
+        try {
+          sessionStorage.setItem("alice-hash-scroll", id);
+          router.push("/");
+        } catch {
+          router.push(`/#${id}`);
+        }
       }
     };
 

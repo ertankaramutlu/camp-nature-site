@@ -2,23 +2,29 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { scrollToHash } from "@/lib/scrollToHash";
 
-/** Blog gibi başka bir sayfadan /#section gelince hash’e yumuşak kaydır. */
+const STORAGE_KEY = "alice-hash-scroll";
+
+/** Blog gibi başka bir sayfadan gelince ease-out kaydır. */
 export default function HashScroll() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const hash = window.location.hash.replace("#", "");
-    if (!hash) return;
+    if (pathname !== "/" && pathname !== "") return;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const t = window.setTimeout(() => {
-      document.getElementById(hash)?.scrollIntoView({
-        behavior: reduce ? "auto" : "smooth",
-        block: "start",
-      });
-    }, 50);
+    let id = "";
+    try {
+      id = sessionStorage.getItem(STORAGE_KEY) ?? "";
+      if (id) sessionStorage.removeItem(STORAGE_KEY);
+    } catch {
+      id = "";
+    }
+    if (!id) id = window.location.hash.replace("#", "");
+    if (!id) return;
 
+    history.replaceState(null, "", `/#${id}`);
+    const t = window.setTimeout(() => scrollToHash(id), 40);
     return () => window.clearTimeout(t);
   }, [pathname]);
 

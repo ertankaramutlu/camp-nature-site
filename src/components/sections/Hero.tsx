@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Compass, Star, Trees } from "lucide-react";
+import { Star, Trees } from "lucide-react";
+import HeroCtas from "@/components/sections/HeroCtas";
 
 export default function Hero() {
   return (
@@ -43,24 +44,7 @@ export default function Hero() {
           kamp ateşi ve doğal bar ile sizi bekleyen sakin, romantik ve aile dostu bir kaçış noktası.
         </p>
 
-        {/* Aksiyon Butonları */}
-        <div className="relative z-20 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <a
-            href="#rezervasyon"
-            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg shadow-emerald-900/30 transition-all"
-          >
-            <Calendar className="w-5 h-5" />
-            Rezervasyon Yap
-          </a>
-
-          <a
-            href="#hakkinda"
-            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 border border-stone-700 bg-stone-900/50 hover:bg-stone-800 text-stone-200 font-semibold px-8 py-4 rounded-xl backdrop-blur-sm transition-all"
-          >
-            <Compass className="w-5 h-5 text-amber-400" />
-            Alanı Keşfet
-          </a>
-        </div>
+        <HeroCtas />
 
         {/* Değerlendirme */}
         <div className="mt-14 pt-8 border-t border-stone-800/80 flex items-center gap-6 text-stone-400 text-sm">
