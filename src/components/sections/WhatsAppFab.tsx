@@ -1,7 +1,6 @@
 import { MessageCircle } from "lucide-react";
 
-// TODO: Gerçek WhatsApp numarasını değiştir (90xxxxxxxxxx yerine gerçek numara)
-const WA_URL = "https://wa.me/90xxxxxxxxxx";
+const WA_URL = "https://wa.me/905543343722";
 
 export default function WhatsAppFab() {
   return (

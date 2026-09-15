@@ -7,8 +7,7 @@ import { client } from "@/sanity/lib/client";
 import { postBySlugQuery, relatedPostsQuery, allSlugsQuery } from "@/sanity/lib/queries";
 import { urlFor } from "@/sanity/lib/image";
 
-// TODO: Gerçek WhatsApp numarasını değiştir
-const WA_BASE = "https://wa.me/90xxxxxxxxxx";
+const WA_BASE = "https://wa.me/905543343722";
 
 export const revalidate = 60;
 

@@ -7,8 +7,7 @@ import {
   priceNote,
 } from "@/lib/stays";
 
-// TODO: Gerçek WhatsApp numarasını değiştir (90xxxxxxxxxx → gerçek numara)
-const WA_BASE = "https://wa.me/90xxxxxxxxxx";
+const WA_BASE = "https://wa.me/905543343722";
 
 const CATEGORY_STYLE: Record<
   Stay["category"],

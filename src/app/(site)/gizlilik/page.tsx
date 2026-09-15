@@ -87,15 +87,14 @@ export default function GizlilikPage() {
           <section>
             <h2 className="text-stone-100 font-bold text-lg mb-2">İletişim</h2>
             <p>
-              {/* TODO: Gerçek WhatsApp numarasını değiştir */}
               WhatsApp:{" "}
               <a
-                href="https://wa.me/90xxxxxxxxxx"
+                href="https://wa.me/905543343722"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-emerald-400 hover:text-emerald-300"
               >
-                wa.me/90xxxxxxxxxx
+                wa.me/905543343722
               </a>
             </p>
           </section>

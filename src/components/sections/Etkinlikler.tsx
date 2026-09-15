@@ -3,8 +3,7 @@ import { client } from "@/sanity/lib/client";
 import { allEventsQuery } from "@/sanity/lib/queries";
 import { urlFor } from "@/sanity/lib/image";
 
-// TODO: Gerçek WhatsApp numarasını değiştir (90xxxxxxxxxx → gerçek numara)
-const WA_BASE = "https://wa.me/90xxxxxxxxxx";
+const WA_BASE = "https://wa.me/905543343722";
 
 /* ── Tip tanımları ── */
 type Badge = "Doğa" | "Sosyal" | "Deniz";

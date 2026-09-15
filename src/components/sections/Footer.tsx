@@ -1,8 +1,7 @@
 import { Leaf, MessageCircle, MapPin } from "lucide-react";
 import Link from "next/link";
 
-// TODO: Gerçek WhatsApp numarasını değiştir (90xxxxxxxxxx → gerçek numara)
-const WA_URL = "https://wa.me/90xxxxxxxxxx";
+const WA_URL = "https://wa.me/905543343722";
 
 export default function Footer() {
   return (

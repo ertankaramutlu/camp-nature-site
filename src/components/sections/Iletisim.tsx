@@ -5,8 +5,7 @@ import { MessageCircle, Calendar, Users, BedDouble, User, Phone, Send, MapPin } 
 import Link from "next/link";
 import { type Stay, FALLBACK_STAYS, formatPrice, stayLabel } from "@/lib/stays";
 
-// TODO: Gerçek WhatsApp numarasını değiştir (90xxxxxxxxxx → gerçek numara)
-const WA_BASE = "https://wa.me/90xxxxxxxxxx";
+const WA_BASE = "https://wa.me/905543343722";
 const MAP_EMBED =
   "https://maps.google.com/maps?q=Boyaba%C4%9F%C4%B1+K%C3%B6y%C3%BC%2C+Karaburun%2C+%C4%B0zmir%2C+Turkey&output=embed&hl=tr&z=13";
 
