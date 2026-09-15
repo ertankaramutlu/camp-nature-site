@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: "/studio",
     },
-    sitemap: "http://localhost:3000/sitemap.xml",
+    sitemap: "https://camp-nature-site-jqiz.vercel.app/sitemap.xml",
   };
 }

@@ -7,7 +7,7 @@ export const revalidate = 60;
 type PostRow = { slug: string; publishedAt: string };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = "http://localhost:3000";
+  const base = "https://camp-nature-site-jqiz.vercel.app";
 
   let posts: PostRow[] = [];
   try {

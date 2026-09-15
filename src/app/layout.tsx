@@ -20,7 +20,7 @@ const OG_IMAGE =
 
 export const metadata: Metadata = {
   // Yayında gerçek domain ile değiştir (örn. https://aliceinboyabagi.com)
-  metadataBase: new URL("http://localhost:3000"),
+  metadataBase: new URL("https://camp-nature-site-jqiz.vercel.app"),
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
   openGraph: {
