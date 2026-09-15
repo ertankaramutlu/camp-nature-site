@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Reveal, Stagger, StaggerItem } from "@/components/Reveal";
 
 const photos = [
   {
@@ -95,23 +96,24 @@ export default function Galeri() {
       <div className="container mx-auto max-w-5xl">
 
         {/* Başlık */}
-        <p className="text-amber-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
-          Galeri
-        </p>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">
-          Boyabağı&apos;ndan Kareler
-        </h2>
-        <p className="text-stone-400 text-base text-center max-w-xl mx-auto mb-14">
-          Kamp ateşinden sahile, glamping çadırından gün batımına — Alice in Boyabağı&apos;ndan anlık görüntüler.
-        </p>
+        <Reveal>
+          <p className="text-amber-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
+            Galeri
+          </p>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">
+            Boyabağı&apos;ndan Kareler
+          </h2>
+          <p className="text-stone-400 text-base text-center max-w-xl mx-auto mb-14">
+            Kamp ateşinden sahile, glamping çadırından gün batımına — Alice in Boyabağı&apos;ndan anlık görüntüler.
+          </p>
+        </Reveal>
 
-        {/* Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        <Stagger className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {photos.map((photo, i) => (
+            <StaggerItem key={i}>
             <button
-              key={i}
               onClick={() => setLightbox(i)}
-              className="group relative aspect-square overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="group relative aspect-square overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full"
               aria-label={`Fotoğrafı büyüt: ${photo.alt}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -127,8 +129,9 @@ export default function Galeri() {
                 </span>
               </div>
             </button>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
 
       {/* Lightbox Overlay */}

@@ -1,11 +1,13 @@
 import { Leaf, MessageCircle, MapPin } from "lucide-react";
 import Link from "next/link";
+import { Reveal } from "@/components/Reveal";
 
 const WA_URL = "https://wa.me/905543343722";
 
 export default function Footer() {
   return (
     <footer className="bg-stone-950 border-t border-stone-800/60 text-stone-400 py-12 px-4">
+      <Reveal>
       <div className="container mx-auto max-w-5xl">
 
         {/* Üst satır */}
@@ -51,6 +53,7 @@ export default function Footer() {
         </div>
 
       </div>
+      </Reveal>
     </footer>
   );
 }

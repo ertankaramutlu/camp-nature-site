@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Reveal, Stagger, StaggerItem } from "@/components/Reveal";
 
 const faqs = [
   {
@@ -37,29 +38,31 @@ const faqs = [
 
 export default function SSS() {
   const [open, setOpen] = useState<number | null>(null);
+  const reduce = useReducedMotion();
 
   return (
     <section id="sss" className="bg-stone-950 text-stone-100 py-24 px-4">
       <div className="container mx-auto max-w-3xl">
 
         {/* Başlık */}
-        <p className="text-amber-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
-          SSS
-        </p>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">
-          Sık Sorulan Sorular
-        </h2>
-        <p className="text-stone-400 text-base text-center max-w-xl mx-auto mb-14">
-          Aklınızdaki soruların cevabını bulamadıysanız WhatsApp&apos;tan bize yazın!
-        </p>
+        <Reveal>
+          <p className="text-amber-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
+            SSS
+          </p>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">
+            Sık Sorulan Sorular
+          </h2>
+          <p className="text-stone-400 text-base text-center max-w-xl mx-auto mb-14">
+            Aklınızdaki soruların cevabını bulamadıysanız WhatsApp&apos;tan bize yazın!
+          </p>
+        </Reveal>
 
-        {/* Accordion */}
-        <div className="flex flex-col gap-3">
+        <Stagger className="flex flex-col gap-3">
           {faqs.map((faq, i) => {
             const isOpen = open === i;
             return (
+              <StaggerItem key={i}>
               <div
-                key={i}
                 className={`border rounded-xl overflow-hidden transition-colors duration-200 ${
                   isOpen
                     ? "border-emerald-700/60 bg-emerald-950/30"
@@ -76,7 +79,7 @@ export default function SSS() {
                   </span>
                   <motion.span
                     animate={{ rotate: isOpen ? 180 : 0 }}
-                    transition={{ duration: 0.25 }}
+                    transition={{ duration: reduce ? 0 : 0.25 }}
                     className="shrink-0 text-emerald-400"
                   >
                     <ChevronDown className="w-5 h-5" />
@@ -90,7 +93,7 @@ export default function SSS() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.28, ease: "easeInOut" }}
+                      transition={{ duration: reduce ? 0 : 0.28, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
                       <p className="px-5 pb-5 text-stone-400 text-sm leading-relaxed">
@@ -100,10 +103,10 @@ export default function SSS() {
                   )}
                 </AnimatePresence>
               </div>
+              </StaggerItem>
             );
           })}
-        </div>
-
+        </Stagger>
       </div>
     </section>
   );

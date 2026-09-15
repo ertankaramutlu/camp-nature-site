@@ -4,6 +4,7 @@ import { useState } from "react";
 import { MessageCircle, Calendar, Users, BedDouble, User, Phone, Send, MapPin } from "lucide-react";
 import Link from "next/link";
 import { type Stay, FALLBACK_STAYS, formatPrice, stayLabel } from "@/lib/stays";
+import { Reveal } from "@/components/Reveal";
 
 const WA_BASE = "https://wa.me/905543343722";
 const MAP_EMBED =
@@ -57,6 +58,7 @@ export default function Iletisim({ stays }: { stays: Stay[] }) {
 
       <div className="container mx-auto max-w-5xl space-y-20">
 
+        <Reveal>
         {/* ── Rezervasyon Paneli ── */}
         <div>
           <p className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
@@ -141,7 +143,9 @@ export default function Iletisim({ stays }: { stays: Stay[] }) {
             )}
           </div>
         </div>
+        </Reveal>
 
+        <Reveal>
         {/* ── İletişim Formu + Harita ── */}
         <div>
           <p className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
@@ -267,6 +271,7 @@ export default function Iletisim({ stays }: { stays: Stay[] }) {
 
           </div>
         </div>
+        </Reveal>
 
       </div>
     </section>

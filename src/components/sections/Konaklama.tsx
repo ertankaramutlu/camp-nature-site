@@ -6,6 +6,7 @@ import {
   formatPrice,
   priceNote,
 } from "@/lib/stays";
+import { Reveal, Stagger, StaggerItem } from "@/components/Reveal";
 
 const WA_BASE = "https://wa.me/905543343722";
 
@@ -30,17 +31,19 @@ export default function Konaklama({ stays }: { stays: Stay[] }) {
     <section id="konaklama" className="bg-stone-900 text-stone-100 py-24 px-4">
       <div className="container mx-auto max-w-5xl">
 
-        <p className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
-          Konaklama
-        </p>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4 text-balance">
-          Konaklamanızı Seçin
-        </h2>
-        <p className="text-stone-400 text-base sm:text-lg text-center max-w-xl mx-auto mb-14">
-          Lüks glamping evlerinden özgür kamp alanına — her bütçeye ve ruhsale uygun seçeneğimiz var.
-        </p>
+        <Reveal>
+          <p className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
+            Konaklama
+          </p>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4 text-balance">
+            Konaklamanızı Seçin
+          </h2>
+          <p className="text-stone-400 text-base sm:text-lg text-center max-w-xl mx-auto mb-14">
+            Lüks glamping evlerinden özgür kamp alanına — her bütçeye ve ruhsale uygun seçeneğimiz var.
+          </p>
+        </Reveal>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {displayed.map((acc) => {
             const style = CATEGORY_STYLE[acc.category] ?? CATEGORY_STYLE.Glamping;
             const waText = encodeURIComponent(
@@ -51,9 +54,9 @@ export default function Konaklama({ stays }: { stays: Stay[] }) {
               : null;
 
             return (
+              <StaggerItem key={acc._id}>
               <div
-                key={acc._id}
-                className="flex flex-col bg-stone-950/70 border border-stone-800/60 rounded-2xl overflow-hidden hover:border-emerald-800/60 transition-all hover:shadow-lg hover:shadow-emerald-950/30"
+                className="flex flex-col h-full bg-stone-950/70 border border-stone-800/60 rounded-2xl overflow-hidden hover:border-emerald-800/60 transition-all hover:shadow-lg hover:shadow-emerald-950/30"
               >
                 {coverUrl && (
                   <div className="aspect-[16/9] overflow-hidden">
@@ -104,10 +107,10 @@ export default function Konaklama({ stays }: { stays: Stay[] }) {
                   </a>
                 </div>
               </div>
+              </StaggerItem>
             );
           })}
-        </div>
-
+        </Stagger>
       </div>
     </section>
   );

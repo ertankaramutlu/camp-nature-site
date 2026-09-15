@@ -2,6 +2,7 @@ import { MessageCircle } from "lucide-react";
 import { client } from "@/sanity/lib/client";
 import { allEventsQuery } from "@/sanity/lib/queries";
 import { urlFor } from "@/sanity/lib/image";
+import { Reveal, Stagger, StaggerItem } from "@/components/Reveal";
 
 const WA_BASE = "https://wa.me/905543343722";
 
@@ -74,7 +75,7 @@ function EventCard({ ev }: { ev: SanityEvent }) {
     : null;
 
   return (
-    <div className={`flex flex-col rounded-2xl border ${style.color} overflow-hidden`}>
+    <div className={`flex flex-col h-full rounded-2xl border ${style.color} overflow-hidden`}>
       {/* Kapak görseli (varsa) */}
       {coverUrl && (
         <div className="aspect-[16/9] overflow-hidden">
@@ -140,21 +141,25 @@ export default async function Etkinlikler() {
     <section id="etkinlikler" className="bg-stone-900 text-stone-100 py-24 px-4">
       <div className="container mx-auto max-w-5xl">
 
-        <p className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
-          Etkinlikler
-        </p>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">
-          Aktiviteler &amp; Deneyimler
-        </h2>
-        <p className="text-stone-400 text-base text-center max-w-xl mx-auto mb-14">
-          Alice in Boyabağı&apos;nda her gün yeni bir deneyim sizi bekliyor. Katılmak için WhatsApp&apos;tan bilgi alın.
-        </p>
+        <Reveal>
+          <p className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
+            Etkinlikler
+          </p>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">
+            Aktiviteler &amp; Deneyimler
+          </h2>
+          <p className="text-stone-400 text-base text-center max-w-xl mx-auto mb-14">
+            Alice in Boyabağı&apos;nda her gün yeni bir deneyim sizi bekliyor. Katılmak için WhatsApp&apos;tan bilgi alın.
+          </p>
+        </Reveal>
 
-        <div className={`grid grid-cols-1 gap-6 ${displayed.length <= 3 ? "sm:grid-cols-3" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
+        <Stagger className={`grid grid-cols-1 gap-6 ${displayed.length <= 3 ? "sm:grid-cols-3" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
           {displayed.map((ev) => (
-            <EventCard key={ev._id} ev={ev} />
+            <StaggerItem key={ev._id}>
+              <EventCard ev={ev} />
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
 
       </div>
     </section>

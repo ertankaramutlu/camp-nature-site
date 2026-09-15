@@ -1,4 +1,5 @@
 import { Tent, Waves, Wine, Flame } from "lucide-react";
+import { Reveal, Stagger, StaggerItem } from "@/components/Reveal";
 
 const features = [
   {
@@ -42,52 +43,47 @@ export default function Hakkinda() {
       className="bg-stone-950 text-stone-100 py-24 px-4"
     >
       <div className="container mx-auto max-w-5xl">
+        <Reveal>
+          <p className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
+            Hakkımızda
+          </p>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-6 text-balance leading-tight">
+            Boyabağı&apos;nın Kalbinde{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-amber-300">
+              Sihirli Bir Kaçış
+            </span>
+          </h2>
+          <p className="text-stone-400 text-base sm:text-lg text-center max-w-2xl mx-auto mb-6 leading-relaxed">
+            İzmir&apos;in batısında, Karaburun yarımadasının en güzel köylerinden Boyabağı&apos;nda, doğanın
+            içinde büyüleyici bir deneyim sizi bekliyor. Alice in Boyabağı; çiftlere, ailelere ve doğayı
+            seven herkese özgün bir konaklama ve tatil deneyimi sunuyor.
+          </p>
+          <p className="text-stone-400 text-base sm:text-lg text-center max-w-2xl mx-auto mb-16 leading-relaxed">
+            Ege kıyısında sakin bir köy atmosferinde; glamping çadırlarımız, açık kamp alanımız, özel plajımız
+            ve barımızla tam anlamıyla bir kaçış noktasıyız. İstanbul ya da İzmir&apos;in gürültüsünü birkaç
+            saatte geride bırakarak Boyabağı&apos;nın huzuruna ulaşabilirsiniz.
+          </p>
+        </Reveal>
 
-        {/* Üst Etiket */}
-        <p className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
-          Hakkımızda
-        </p>
-
-        {/* Başlık */}
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-6 text-balance leading-tight">
-          Boyabağı&apos;nın Kalbinde{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-amber-300">
-            Sihirli Bir Kaçış
-          </span>
-        </h2>
-
-        {/* Açıklama */}
-        <p className="text-stone-400 text-base sm:text-lg text-center max-w-2xl mx-auto mb-6 leading-relaxed">
-          İzmir&apos;in batısında, Karaburun yarımadasının en güzel köylerinden Boyabağı&apos;nda, doğanın
-          içinde büyüleyici bir deneyim sizi bekliyor. Alice in Boyabağı; çiftlere, ailelere ve doğayı
-          seven herkese özgün bir konaklama ve tatil deneyimi sunuyor.
-        </p>
-        <p className="text-stone-400 text-base sm:text-lg text-center max-w-2xl mx-auto mb-16 leading-relaxed">
-          Ege kıyısında sakin bir köy atmosferinde; glamping çadırlarımız, açık kamp alanımız, özel plajımız
-          ve barımızla tam anlamıyla bir kaçış noktasıyız. İstanbul ya da İzmir&apos;in gürültüsünü birkaç
-          saatte geride bırakarak Boyabağı&apos;nın huzuruna ulaşabilirsiniz.
-        </p>
-
-        {/* Özellik Kartları */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <Stagger className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {features.map((f) => (
-            <div
-              key={f.title}
-              className={`rounded-2xl border ${f.border} ${f.bg} p-6 flex gap-4 items-start backdrop-blur-sm`}
-            >
-              <div className={`mt-1 shrink-0 ${f.color}`}>
-                <f.icon className="w-7 h-7" />
+            <StaggerItem key={f.title}>
+              <div
+                className={`rounded-2xl border ${f.border} ${f.bg} p-6 flex gap-4 items-start backdrop-blur-sm h-full`}
+              >
+                <div className={`mt-1 shrink-0 ${f.color}`}>
+                  <f.icon className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-stone-100 mb-1">{f.title}</h3>
+                  <p className="text-stone-400 text-sm leading-relaxed">{f.desc}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-lg text-stone-100 mb-1">{f.title}</h3>
-                <p className="text-stone-400 text-sm leading-relaxed">{f.desc}</p>
-              </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
 
-        {/* Alt Stat Bantı */}
-        <div className="mt-16 pt-10 border-t border-stone-800/60 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+        <Reveal className="mt-16 pt-10 border-t border-stone-800/60 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center" delay={0.08}>
           {[
             { value: "Karaburun", label: "Yarımadası" },
             { value: "Boyabağı", label: "Köy, İzmir" },
@@ -99,8 +95,7 @@ export default function Hakkinda() {
               <p className="text-stone-500 text-sm">{s.label}</p>
             </div>
           ))}
-        </div>
-
+        </Reveal>
       </div>
     </section>
   );
