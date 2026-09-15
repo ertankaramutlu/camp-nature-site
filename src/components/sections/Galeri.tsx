@@ -67,31 +67,73 @@ const photos = [
   },
 ];
 
-export default function Galeri() {
-  const [lightbox, setLightbox] = useState<number | null>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
-  const drag = useRef({ active: false, startX: 0, startScroll: 0, moved: false });
+const DRAG_PX = 10;
 
-  const close = useCallback(() => setLightbox(null), []);
+function zoomBox(card: HTMLElement | null) {
+  const cw = card?.offsetWidth ?? 293;
+  const ch = card?.offsetHeight ?? 220;
+  let w = cw * 4;
+  let h = ch * 4;
+  const s = Math.min(1, (window.innerWidth * 0.92) / w, (window.innerHeight * 0.86) / h);
+  return { w: Math.round(w * s), h: Math.round(h * s) };
+}
+
+export default function Galeri() {
+  const [zoom, setZoom] = useState<number | null>(null);
+  const [anim, setAnim] = useState(false);
+  const [box, setBox] = useState({ w: 400, h: 300 });
+  const stripRef = useRef<HTMLDivElement>(null);
+  const ignoreClose = useRef(false);
+  const press = useRef({
+    x: 0,
+    scroll: 0,
+    i: null as number | null,
+    dragging: false,
+    mouse: false,
+  });
+
+  const close = useCallback(() => {
+    if (ignoreClose.current) return;
+    setAnim(false);
+    window.setTimeout(() => setZoom(null), 180);
+  }, []);
+
+  const open = useCallback((i: number) => {
+    ignoreClose.current = true;
+    setAnim(false);
+    setBox(zoomBox(stripRef.current?.querySelector("[data-galeri-card]") ?? null));
+    setZoom(i);
+    requestAnimationFrame(() => setAnim(true));
+    window.setTimeout(() => {
+      ignoreClose.current = false;
+    }, 350);
+  }, []);
   const prev = useCallback(() =>
-    setLightbox((i) => (i !== null ? (i - 1 + photos.length) % photos.length : null)), []);
+    setZoom((i) => (i !== null ? (i - 1 + photos.length) % photos.length : null)), []);
   const next = useCallback(() =>
-    setLightbox((i) => (i !== null ? (i + 1) % photos.length : null)), []);
+    setZoom((i) => (i !== null ? (i + 1) % photos.length : null)), []);
 
   useEffect(() => {
-    if (lightbox === null) return;
+    if (zoom === null) {
+      setAnim(false);
+      return;
+    }
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
       if (e.key === "ArrowLeft") prev();
       if (e.key === "ArrowRight") next();
     };
+    const onResize = () =>
+      setBox(zoomBox(stripRef.current?.querySelector("[data-galeri-card]") ?? null));
     window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
     document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
       document.body.style.overflow = "";
     };
-  }, [lightbox, close, prev, next]);
+  }, [zoom, close, prev, next]);
 
   const scrollByCard = (dir: -1 | 1) => {
     const el = stripRef.current;
@@ -102,25 +144,50 @@ export default function Galeri() {
   };
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType === "touch") return;
     if ((e.target as HTMLElement).closest("[data-galeri-arrow]")) return;
     const el = stripRef.current;
     if (!el) return;
-    drag.current = { active: true, startX: e.clientX, startScroll: el.scrollLeft, moved: false };
-    el.setPointerCapture(e.pointerId);
+    const card = (e.target as HTMLElement).closest<HTMLElement>("[data-galeri-card]");
+    const i = card ? Number(card.dataset.index) : null;
+    const mouse = e.pointerType !== "touch";
+    press.current = {
+      x: e.clientX,
+      scroll: el.scrollLeft,
+      i: Number.isFinite(i) ? i : null,
+      dragging: false,
+      mouse,
+    };
+    if (mouse) el.setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!drag.current.active) return;
     const el = stripRef.current;
     if (!el) return;
-    const dx = e.clientX - drag.current.startX;
-    if (Math.abs(dx) > 6) drag.current.moved = true;
-    el.scrollLeft = drag.current.startScroll - dx;
+    const dx = e.clientX - press.current.x;
+    if (Math.abs(dx) > DRAG_PX) press.current.dragging = true;
+    if (press.current.mouse && el.hasPointerCapture(e.pointerId)) {
+      el.scrollLeft = press.current.scroll - dx;
+    } else if (Math.abs(el.scrollLeft - press.current.scroll) > DRAG_PX) {
+      press.current.dragging = true;
+    }
   };
 
-  const onPointerUp = () => {
-    drag.current.active = false;
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = stripRef.current;
+    if (el && Math.abs(el.scrollLeft - press.current.scroll) > DRAG_PX) {
+      press.current.dragging = true;
+    }
+    if (el && press.current.mouse) {
+      try {
+        el.releasePointerCapture(e.pointerId);
+      } catch {
+        /* already released */
+      }
+    }
+    const { dragging, i } = press.current;
+    press.current.i = null;
+    press.current.mouse = false;
+    if (!dragging && i !== null) open(i);
   };
 
   return (
@@ -173,12 +240,13 @@ export default function Galeri() {
                 key={i}
                 type="button"
                 data-galeri-card
-                onClick={() => {
-                  if (drag.current.moved) return;
-                  setLightbox(i);
-                }}
+                data-index={i}
                 className="group relative shrink-0 h-[220px] sm:h-[248px] md:h-[268px] aspect-[4/3] overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                aria-label={`Fotoğrafı büyüt: ${photo.alt}`}
+                aria-label="Fotoğrafı büyüt"
+                onClick={() => {
+                  if (press.current.dragging) return;
+                  open(i);
+                }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -188,57 +256,59 @@ export default function Galeri() {
                   draggable={false}
                   className="w-full h-full object-cover pointer-events-none transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-stone-950/0 group-hover:bg-stone-950/25 transition-colors duration-300 flex items-center justify-center">
-                  <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 px-3 py-1 rounded-full">
-                    {photo.alt}
-                  </span>
-                </div>
               </button>
             ))}
           </div>
         </div>
       </Reveal>
 
-      {lightbox !== null && (
+      {zoom !== null && (
         <div
-          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center"
+          className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/45 transition-opacity duration-[250ms] ${
+            anim ? "opacity-100" : "opacity-0"
+          }`}
           onClick={close}
         >
           <button
+            type="button"
             onClick={close}
-            className="absolute top-4 right-4 text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors z-10"
+            className="absolute top-4 right-4 text-white bg-black/40 hover:bg-black/60 p-2 rounded-full z-10"
             aria-label="Kapat"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
 
           <button
+            type="button"
             onClick={(e) => { e.stopPropagation(); prev(); }}
-            className="absolute left-3 sm:left-6 text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors z-10"
+            className="absolute left-2 sm:left-6 text-white bg-black/40 hover:bg-black/60 p-2 rounded-full z-10"
             aria-label="Önceki"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
 
-          <div className="max-w-4xl max-h-[85vh] px-14" onClick={(e) => e.stopPropagation()}>
+          <div
+            className={`relative overflow-hidden rounded-xl shadow-2xl transition-transform duration-[250ms] ease-out ${
+              anim ? "scale-100" : "scale-[0.25]"
+            }`}
+            style={{ width: box.w, height: box.h }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={photos[lightbox].src}
-              alt={photos[lightbox].alt}
-              className="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl"
+              src={photos[zoom].src}
+              alt={photos[zoom].alt}
+              className="w-full h-full object-cover"
             />
-            <p className="text-stone-300 text-sm text-center mt-3">
-              {photos[lightbox].alt}
-              <span className="text-stone-600 ml-3">{lightbox + 1} / {photos.length}</span>
-            </p>
           </div>
 
           <button
+            type="button"
             onClick={(e) => { e.stopPropagation(); next(); }}
-            className="absolute right-3 sm:right-6 text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors z-10"
+            className="absolute right-2 sm:right-6 text-white bg-black/40 hover:bg-black/60 p-2 rounded-full z-10"
             aria-label="Sonraki"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       )}
