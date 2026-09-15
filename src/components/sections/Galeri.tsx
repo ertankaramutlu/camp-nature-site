@@ -83,6 +83,8 @@ export default function Galeri() {
   const [anim, setAnim] = useState(false);
   const [box, setBox] = useState({ w: 400, h: 300 });
   const stripRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
   const ignoreClose = useRef(false);
   const press = useRef({
     x: 0,
@@ -134,6 +136,29 @@ export default function Galeri() {
       document.body.style.overflow = "";
     };
   }, [zoom, close, prev, next]);
+
+  const updateArrows = useCallback(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 2);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 2);
+  }, []);
+
+  useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    updateArrows();
+    el.addEventListener("scroll", updateArrows, { passive: true });
+    window.addEventListener("resize", updateArrows);
+    const imgs = el.querySelectorAll("img");
+    imgs.forEach((img) => img.addEventListener("load", updateArrows));
+    return () => {
+      el.removeEventListener("scroll", updateArrows);
+      window.removeEventListener("resize", updateArrows);
+      imgs.forEach((img) => img.removeEventListener("load", updateArrows));
+    };
+  }, [updateArrows]);
 
   const scrollByCard = (dir: -1 | 1) => {
     const el = stripRef.current;
@@ -208,24 +233,28 @@ export default function Galeri() {
 
       <Reveal delay={0.06}>
         <div className="relative container mx-auto max-w-5xl">
-          <button
-            type="button"
-            data-galeri-arrow
-            onClick={() => scrollByCard(-1)}
-            className="absolute left-1 sm:left-2 top-1/2 z-10 -translate-y-1/2 hidden sm:flex items-center justify-center size-10 rounded-full bg-stone-950/80 border border-stone-700 text-stone-100 hover:bg-stone-800"
-            aria-label="Önceki fotoğraflar"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            type="button"
-            data-galeri-arrow
-            onClick={() => scrollByCard(1)}
-            className="absolute right-1 sm:right-2 top-1/2 z-10 -translate-y-1/2 hidden sm:flex items-center justify-center size-10 rounded-full bg-stone-950/80 border border-stone-700 text-stone-100 hover:bg-stone-800"
-            aria-label="Sonraki fotoğraflar"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+          {canScrollLeft && (
+            <button
+              type="button"
+              data-galeri-arrow
+              onClick={() => scrollByCard(-1)}
+              className="absolute left-1 sm:left-2 top-1/2 z-10 -translate-y-1/2 hidden sm:flex items-center justify-center size-10 rounded-full bg-stone-950/80 border border-stone-700 text-stone-100 hover:bg-stone-800"
+              aria-label="Önceki fotoğraflar"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          )}
+          {canScrollRight && (
+            <button
+              type="button"
+              data-galeri-arrow
+              onClick={() => scrollByCard(1)}
+              className="absolute right-1 sm:right-2 top-1/2 z-10 -translate-y-1/2 hidden sm:flex items-center justify-center size-10 rounded-full bg-stone-950/80 border border-stone-700 text-stone-100 hover:bg-stone-800"
+              aria-label="Sonraki fotoğraflar"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          )}
 
           <div
             ref={stripRef}
@@ -264,7 +293,7 @@ export default function Galeri() {
 
       {zoom !== null && (
         <div
-          className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/45 transition-opacity duration-[250ms] ${
+          className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/45 backdrop-blur-md transition-opacity duration-[250ms] ${
             anim ? "opacity-100" : "opacity-0"
           }`}
           onClick={close}
