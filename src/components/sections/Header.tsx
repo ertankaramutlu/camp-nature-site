@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X, Leaf } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { usePathname, useRouter } from "next/navigation";
 
 const navLinks = [
   { label: "Hakkında", href: "/#hakkinda" },
@@ -14,9 +14,18 @@ const navLinks = [
   { label: "Blog", href: "/blog" },
 ];
 
+function scrollToHash(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+}
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -24,7 +33,39 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const closeMenu = () => setIsOpen(false);
+  const onNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+    fromMenu = false,
+  ) => {
+    const hashAt = href.indexOf("#");
+    const isHash = hashAt !== -1;
+
+    if (fromMenu) {
+      setIsOpen(false);
+    }
+
+    if (!isHash) return;
+
+    e.preventDefault();
+    const id = href.slice(hashAt + 1);
+    const onHome = pathname === "/" || pathname === "";
+
+    const go = () => {
+      if (onHome) {
+        scrollToHash(id);
+        history.pushState(null, "", `/#${id}`);
+      } else {
+        router.push(`/#${id}`);
+      }
+    };
+
+    if (fromMenu) {
+      requestAnimationFrame(() => requestAnimationFrame(go));
+    } else {
+      go();
+    }
+  };
 
   return (
     <header
@@ -50,6 +91,7 @@ export default function Header() {
             <a
               key={link.href}
               href={link.href}
+              onClick={(e) => onNavClick(e, link.href)}
               className="text-stone-300 hover:text-emerald-300 text-sm font-medium transition-colors"
             >
               {link.label}
@@ -59,13 +101,12 @@ export default function Header() {
 
         {/* Desktop CTA */}
         <div className="hidden md:block">
-          <a href="/#rezervasyon">
-            <Button
-              size="sm"
-              className="bg-emerald-700 hover:bg-emerald-600 text-white font-semibold rounded-lg px-5 cursor-pointer"
-            >
-              Rezervasyon
-            </Button>
+          <a
+            href="/#rezervasyon"
+            onClick={(e) => onNavClick(e, "/#rezervasyon")}
+            className="inline-flex items-center justify-center bg-emerald-700 hover:bg-emerald-600 text-white font-semibold rounded-lg px-5 h-8 text-sm"
+          >
+            Rezervasyon
           </a>
         </div>
 
@@ -79,15 +120,18 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Mobil Menü */}
-      {isOpen && (
-        <div className="md:hidden bg-stone-950/98 backdrop-blur-md border-t border-stone-800/60 px-4 pb-6 pt-4">
+      {/* Mobil Menü — unmount etme; tıklama iptal olmasın */}
+      <div
+        className={`md:hidden bg-stone-950/98 backdrop-blur-md border-t border-stone-800/60 px-4 pb-6 pt-4 ${
+          isOpen ? "" : "hidden"
+        }`}
+      >
           <nav className="flex flex-col gap-1">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                onClick={closeMenu}
+                onClick={(e) => onNavClick(e, link.href, true)}
                 className="text-stone-300 hover:text-emerald-300 hover:bg-stone-800/50 text-base font-medium py-3 px-3 rounded-lg transition-colors"
               >
                 {link.label}
@@ -95,14 +139,15 @@ export default function Header() {
             ))}
           </nav>
           <div className="mt-4 pt-4 border-t border-stone-800/60">
-            <a href="/#rezervasyon" onClick={closeMenu}>
-              <Button className="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-semibold rounded-lg cursor-pointer">
-                Rezervasyon Yap
-              </Button>
+            <a
+              href="/#rezervasyon"
+              onClick={(e) => onNavClick(e, "/#rezervasyon", true)}
+              className="flex w-full items-center justify-center bg-emerald-700 hover:bg-emerald-600 text-white font-semibold rounded-lg h-10 text-sm"
+            >
+              Rezervasyon Yap
             </a>
           </div>
         </div>
-      )}
     </header>
   );
 }

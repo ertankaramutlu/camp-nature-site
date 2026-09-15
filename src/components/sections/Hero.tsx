@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Compass, Star, Trees } from "lucide-react";
 
@@ -7,7 +6,7 @@ export default function Hero() {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-stone-900 text-stone-100">
       {/* Arka Plan Görseli ve Karartma Katmanı */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 pointer-events-none">
         <Image
           src="https://images.unsplash.com/photo-1510312305653-8ed496efae75?q=80&w=2000&auto=format&fit=crop"
           alt="Alice in Boyabağı Glamping Kamp Alanı"
@@ -45,26 +44,21 @@ export default function Hero() {
         </p>
 
         {/* Aksiyon Butonları */}
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <a href="#rezervasyon">
-            <Button
-              size="lg"
-              className="w-full sm:w-auto bg-emerald-700 hover:bg-emerald-600 text-white gap-2 font-semibold px-8 py-6 rounded-xl shadow-lg shadow-emerald-900/30 transition-all cursor-pointer"
-            >
-              <Calendar className="w-5 h-5" />
-              Rezervasyon Yap
-            </Button>
+        <div className="relative z-20 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+          <a
+            href="#rezervasyon"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg shadow-emerald-900/30 transition-all"
+          >
+            <Calendar className="w-5 h-5" />
+            Rezervasyon Yap
           </a>
 
-          <a href="#hakkinda">
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full sm:w-auto border-stone-700 bg-stone-900/50 hover:bg-stone-800 text-stone-200 gap-2 font-semibold px-8 py-6 rounded-xl backdrop-blur-sm transition-all cursor-pointer"
-            >
-              <Compass className="w-5 h-5 text-amber-400" />
-              Alanı Keşfet
-            </Button>
+          <a
+            href="#hakkinda"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 border border-stone-700 bg-stone-900/50 hover:bg-stone-800 text-stone-200 font-semibold px-8 py-4 rounded-xl backdrop-blur-sm transition-all"
+          >
+            <Compass className="w-5 h-5 text-amber-400" />
+            Alanı Keşfet
           </a>
         </div>
 

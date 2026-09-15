@@ -54,7 +54,7 @@ export default function Iletisim({ stays }: { stays: Stay[] }) {
   return (
     <section id="iletisim" className="bg-stone-900 text-stone-100 py-24 px-4">
       {/* Hero "Rezervasyon" anchor */}
-      <span id="rezervasyon" className="-mt-20 pt-20 block" aria-hidden />
+      <span id="rezervasyon" className="block" aria-hidden />
 
       <div className="container mx-auto max-w-5xl space-y-20">
 
