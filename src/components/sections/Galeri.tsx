@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { Reveal, Stagger, StaggerItem } from "@/components/Reveal";
+import { Reveal } from "@/components/Reveal";
 
 const photos = [
   {
@@ -69,6 +69,8 @@ const photos = [
 
 export default function Galeri() {
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const stripRef = useRef<HTMLDivElement>(null);
+  const drag = useRef({ active: false, startX: 0, startScroll: 0, moved: false });
 
   const close = useCallback(() => setLightbox(null), []);
   const prev = useCallback(() =>
@@ -91,11 +93,39 @@ export default function Galeri() {
     };
   }, [lightbox, close, prev, next]);
 
-  return (
-    <section id="galeri" className="bg-stone-950 text-stone-100 py-24 px-4">
-      <div className="container mx-auto max-w-5xl">
+  const scrollByCard = (dir: -1 | 1) => {
+    const el = stripRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>("[data-galeri-card]");
+    const step = (card?.offsetWidth ?? 280) + 12;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
 
-        {/* Başlık */}
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === "touch") return;
+    if ((e.target as HTMLElement).closest("[data-galeri-arrow]")) return;
+    const el = stripRef.current;
+    if (!el) return;
+    drag.current = { active: true, startX: e.clientX, startScroll: el.scrollLeft, moved: false };
+    el.setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!drag.current.active) return;
+    const el = stripRef.current;
+    if (!el) return;
+    const dx = e.clientX - drag.current.startX;
+    if (Math.abs(dx) > 6) drag.current.moved = true;
+    el.scrollLeft = drag.current.startScroll - dx;
+  };
+
+  const onPointerUp = () => {
+    drag.current.active = false;
+  };
+
+  return (
+    <section id="galeri" className="bg-stone-950 text-stone-100 py-24 overflow-x-hidden">
+      <div className="container mx-auto max-w-5xl px-4">
         <Reveal>
           <p className="text-amber-400 text-sm font-semibold tracking-widest uppercase mb-4 text-center">
             Galeri
@@ -103,44 +133,77 @@ export default function Galeri() {
           <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">
             Boyabağı&apos;ndan Kareler
           </h2>
-          <p className="text-stone-400 text-base text-center max-w-xl mx-auto mb-14">
+          <p className="text-stone-400 text-base text-center max-w-xl mx-auto mb-10">
             Kamp ateşinden sahile, glamping çadırından gün batımına — Alice in Boyabağı&apos;ndan anlık görüntüler.
           </p>
         </Reveal>
-
-        <Stagger className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {photos.map((photo, i) => (
-            <StaggerItem key={i}>
-            <button
-              onClick={() => setLightbox(i)}
-              className="group relative aspect-square overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full"
-              aria-label={`Fotoğrafı büyüt: ${photo.alt}`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={photo.thumb}
-                alt={photo.alt}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-stone-950/0 group-hover:bg-stone-950/30 transition-colors duration-300 flex items-center justify-center">
-                <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 px-3 py-1 rounded-full">
-                  {photo.alt}
-                </span>
-              </div>
-            </button>
-            </StaggerItem>
-          ))}
-        </Stagger>
       </div>
 
-      {/* Lightbox Overlay */}
+      <Reveal delay={0.06}>
+        <div className="relative container mx-auto max-w-5xl">
+          <button
+            type="button"
+            data-galeri-arrow
+            onClick={() => scrollByCard(-1)}
+            className="absolute left-1 sm:left-2 top-1/2 z-10 -translate-y-1/2 hidden sm:flex items-center justify-center size-10 rounded-full bg-stone-950/80 border border-stone-700 text-stone-100 hover:bg-stone-800"
+            aria-label="Önceki fotoğraflar"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            data-galeri-arrow
+            onClick={() => scrollByCard(1)}
+            className="absolute right-1 sm:right-2 top-1/2 z-10 -translate-y-1/2 hidden sm:flex items-center justify-center size-10 rounded-full bg-stone-950/80 border border-stone-700 text-stone-100 hover:bg-stone-800"
+            aria-label="Sonraki fotoğraflar"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+
+          <div
+            ref={stripRef}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+            className="flex flex-nowrap gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain px-4 py-1 cursor-grab active:cursor-grabbing select-none touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {photos.map((photo, i) => (
+              <button
+                key={i}
+                type="button"
+                data-galeri-card
+                onClick={() => {
+                  if (drag.current.moved) return;
+                  setLightbox(i);
+                }}
+                className="group relative shrink-0 h-[220px] sm:h-[248px] md:h-[268px] aspect-[4/3] overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                aria-label={`Fotoğrafı büyüt: ${photo.alt}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photo.thumb}
+                  alt={photo.alt}
+                  loading="lazy"
+                  draggable={false}
+                  className="w-full h-full object-cover pointer-events-none transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-stone-950/0 group-hover:bg-stone-950/25 transition-colors duration-300 flex items-center justify-center">
+                  <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 px-3 py-1 rounded-full">
+                    {photo.alt}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </Reveal>
+
       {lightbox !== null && (
         <div
           className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center"
           onClick={close}
         >
-          {/* Kapat */}
           <button
             onClick={close}
             className="absolute top-4 right-4 text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors z-10"
@@ -149,7 +212,6 @@ export default function Galeri() {
             <X className="w-6 h-6" />
           </button>
 
-          {/* Önceki */}
           <button
             onClick={(e) => { e.stopPropagation(); prev(); }}
             className="absolute left-3 sm:left-6 text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors z-10"
@@ -158,7 +220,6 @@ export default function Galeri() {
             <ChevronLeft className="w-6 h-6" />
           </button>
 
-          {/* Görsel */}
           <div className="max-w-4xl max-h-[85vh] px-14" onClick={(e) => e.stopPropagation()}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -172,7 +233,6 @@ export default function Galeri() {
             </p>
           </div>
 
-          {/* Sonraki */}
           <button
             onClick={(e) => { e.stopPropagation(); next(); }}
             className="absolute right-3 sm:right-6 text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors z-10"
